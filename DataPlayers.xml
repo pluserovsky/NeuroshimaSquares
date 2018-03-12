@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Players>
+    <Player>
+        <ID>1</ID>
+        <Name>Player 1</Name>
+        <Rank>1</Rank>
+        <Score>0</Score>
+    </Player>
+    <Player>
+        <ID>2</ID>
+        <Name>Player 2</Name>
+        <Rank>0</Rank>
+        <Score>0</Score>
+    </Player>
+    <Player>
+        <ID>3</ID>
+        <Name>Player 3</Name>
+        <Rank>0</Rank>
+        <Score>0</Score>
+    </Player>
+    <Player>
+        <ID>4</ID>
+        <Name>Player 4</Name>
+        <Rank>0</Rank>
+        <Score>0</Score>
+    </Player>
+</Players>
