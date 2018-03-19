@@ -47,10 +47,10 @@ import java.awt.event.FocusEvent;
 public class LogWindow extends JFrame implements ActionListener, ListSelectionListener {
 
 	private JPanel contentPane;
-	private JPanel panelAction,panelPlayer,panelListPlayers,panelAllPlayers;
-	private JButton btnPlay,btnShowRankPlayers,btnExit,btnRemove;
+	private JPanel panelAction, panelPlayer, panelListPlayers, panelAllPlayers;
+	private JButton btnPlay, btnShowRankPlayers, btnExit, btnRemove;
 	private JTextField txtPlayerName;
-	private JList listOfPlayers,listAllPlayers;
+	private JList listOfPlayers, listAllPlayers;
 	private DefaultListModel modelChoicePlayer, modelAllPlayers;
 	private JButton btnAdd;
 	private Players players;
@@ -58,22 +58,23 @@ public class LogWindow extends JFrame implements ActionListener, ListSelectionLi
 	private ArrayList<User> usersList = new ArrayList<User>();
 	private NeuroshimaApp mainFrame;
 	private JScrollPane scrollAllPlayers;
+
 	/**
 	 * 
-	 * Inner class for players 
+	 * Inner class for players
 	 *
 	 */
 	@XmlRootElement(name = "Players")
-	static class Players
-	{
-		@XmlElement (name = "Player")
-		List<User> playersList=null;
+	static class Players {
+		@XmlElement(name = "Player")
+		List<User> playersList = null;
 
 		public List<User> getPlayersList() {
 			return playersList;
 		}
 
 	}
+
 	/**
 	 * Create the frame.
 	 */
@@ -166,20 +167,19 @@ public class LogWindow extends JFrame implements ActionListener, ListSelectionLi
 		}
 		btnRemove.addActionListener(this);
 		panelListPlayers.add(btnRemove);
-		
+
 		panelAllPlayers = new JPanel();
 		panelAllPlayers.setBounds(487, 13, 160, 219);
 		panelAllPlayers.setBorder(BorderFactory.createTitledBorder("Available players"));
 		contentPane.add(panelAllPlayers);
-		
+
 		modelAllPlayers = new DefaultListModel();
 		listAllPlayers = new JList(modelAllPlayers);
 		listAllPlayers.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
 				Object z = e.getSource();
-				if(z==listAllPlayers)
-				{
+				if (z == listAllPlayers) {
 					txtPlayerName.setText("");
 				}
 			}
@@ -190,12 +190,12 @@ public class LogWindow extends JFrame implements ActionListener, ListSelectionLi
 		listAllPlayers.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		listAllPlayers.setLayoutOrientation(JList.VERTICAL);
 		listAllPlayers.setVisibleRowCount(-1);
-		//scrollAllPlayers = new JScrollPane(listAllPlayers);
-		//scrollAllPlayers.setBounds(12, 207, 136, -184);
+		// scrollAllPlayers = new JScrollPane(listAllPlayers);
+		// scrollAllPlayers.setBounds(12, 207, 136, -184);
 		panelAllPlayers.add(listAllPlayers);
 		this.setLocationRelativeTo(null);
 		this.setTitle("Neuroshima");
-		
+
 		unmarshal();
 	}
 
@@ -203,50 +203,38 @@ public class LogWindow extends JFrame implements ActionListener, ListSelectionLi
 	public void actionPerformed(ActionEvent e) {
 		Object z = e.getSource();
 
-		if(z == btnAdd)
-		{
-			if(modelChoicePlayer.getSize()==4)
-			{
-				JOptionPane.showMessageDialog(this, "Too many players! (max. 4 players)", "Waring", JOptionPane.WARNING_MESSAGE);
-			}
-			else {
+		if (z == btnAdd) {
+			if (modelChoicePlayer.getSize() == 4) {
+				JOptionPane.showMessageDialog(this, "Too many players! (max. 4 players)", "Waring",
+						JOptionPane.WARNING_MESSAGE);
+			} else {
 				addUserToGame();
-				if(modelChoicePlayer.getSize()>1) btnPlay.setEnabled(true);	
-				else btnPlay.setEnabled(false);
+				if (modelChoicePlayer.getSize() > 1)
+					btnPlay.setEnabled(true);
+				else
+					btnPlay.setEnabled(false);
 			}
-		}
-		else if(z == btnExit)
-		{
+		} else if (z == btnExit) {
 			System.exit(0);
-		}
-		else if(z == btnPlay)
-		{
-			for(int i=0; i<modelChoicePlayer.getSize();i++)
-			{
-				for(User user: players.playersList)
-				{
-					if(user.getName().equals(modelChoicePlayer.getElementAt(i)))
+		} else if (z == btnPlay) {
+			for (int i = 0; i < modelChoicePlayer.getSize(); i++) {
+				for (User user : players.playersList) {
+					if (user.getName().equals(modelChoicePlayer.getElementAt(i)))
 						usersList.add(user);
 				}
 			}
 			this.setVisible(false);
 			mainFrame.ShowMainFrame();
-		}
-		else if( z== btnShowRankPlayers)
-		{
+		} else if (z == btnShowRankPlayers) {
 
-		}
-		else if(z==btnRemove)
-		{
-			if(modelChoicePlayer.size()!=0 && listOfPlayers.getSelectedIndex()!=-1)
-			{
+		} else if (z == btnRemove) {
+			if (modelChoicePlayer.size() != 0 && listOfPlayers.getSelectedIndex() != -1) {
 				modelChoicePlayer.removeElementAt(listOfPlayers.getSelectedIndex());
-			}
-			else JOptionPane.showMessageDialog(this,"Empty list or do not choose player!" );
-			if(modelChoicePlayer.size()<2) btnPlay.setEnabled(false);
-		}
-		else if(z==txtPlayerName)
-		{
+			} else
+				JOptionPane.showMessageDialog(this, "Empty list or do not choose player!");
+			if (modelChoicePlayer.size() < 2)
+				btnPlay.setEnabled(false);
+		} else if (z == txtPlayerName) {
 			listAllPlayers.clearSelection();
 		}
 	}
@@ -254,77 +242,63 @@ public class LogWindow extends JFrame implements ActionListener, ListSelectionLi
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		Object z = e.getSource();
-		
-		if(z== listAllPlayers)
-		{
+
+		if (z == listAllPlayers) {
 			System.out.print("LuL1");
 		}
-		
+
 	}
-	
+
 	/**
 	 * Function to add user
 	 */
-	public void addUserToGame()
-	{
-		boolean isOnList=false;
-		if(txtPlayerName.getText().length()!=0)
-		{
-			for(User user: players.playersList)
-			{
-				if(txtPlayerName.getText().equals(user.getName()))
-				{
-					if(JOptionPane.showConfirmDialog(this, "This nick is used, would you like to play as this player?","Question",
-							JOptionPane.OK_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE)==0)
-					{
-						for(int i=0;i<modelChoicePlayer.size();i++)
-						{
-							if(user.getName().equals(modelChoicePlayer.getElementAt(i)))
-							{
-								isOnList=true;
+	public void addUserToGame() {
+		boolean isOnList = false;
+		if (txtPlayerName.getText().length() != 0) {
+			for (User user : players.playersList) {
+				if (txtPlayerName.getText().equals(user.getName())) {
+					if (JOptionPane.showConfirmDialog(this, "This nick is used, would you like to play as this player?",
+							"Question", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == 0) {
+						for (int i = 0; i < modelChoicePlayer.size(); i++) {
+							if (user.getName().equals(modelChoicePlayer.getElementAt(i))) {
+								isOnList = true;
 								break;
 							}
 						}
-						if(isOnList==false) {
+						if (isOnList == false) {
 							modelChoicePlayer.addElement(user.getName());
 							txtPlayerName.setText("");
-							createUser= false;
-						}
-						else JOptionPane.showMessageDialog(this, "This user is on list!");
+							createUser = false;
+						} else
+							JOptionPane.showMessageDialog(this, "This user is on list!");
 					}
-					createUser= false;
+					createUser = false;
 					txtPlayerName.setText("");
 					break;
 				}
 			}
-			if(createUser)
-			{
-				User user = new User(players.playersList.size()+1,txtPlayerName.getText(),0);
+			if (createUser) {
+				User user = new User(players.playersList.size() + 1, txtPlayerName.getText(), 0);
 				players.playersList.add(user);
 				modelChoicePlayer.addElement(user.getName());
 				marshall();
 				txtPlayerName.setText("");
 			}
 			createUser = true;
-		}
-		else if(listAllPlayers.getSelectedIndex()!=-1)
-		{
-			for(int i=0; i<modelChoicePlayer.size(); i++)
-			{
-				if(listAllPlayers.getSelectedValue().toString().substring(2).equals(modelChoicePlayer.getElementAt(i).toString()))
-				{
-					isOnList=true;
+		} else if (listAllPlayers.getSelectedIndex() != -1) {
+			for (int i = 0; i < modelChoicePlayer.size(); i++) {
+				if (listAllPlayers.getSelectedValue().toString().substring(2)
+						.equals(modelChoicePlayer.getElementAt(i).toString())) {
+					isOnList = true;
 					break;
 				}
 			}
-			if(isOnList==false) 
-			{
+			if (isOnList == false) {
 				modelChoicePlayer.addElement(listAllPlayers.getSelectedValue().toString().substring(2));
 				txtPlayerName.setText("");
-			}
-			else JOptionPane.showMessageDialog(this, "This user is on list!");
-		}
-		else {
+			} else
+				JOptionPane.showMessageDialog(this, "This user is on list!");
+		} else {
 			JOptionPane.showMessageDialog(this, "Field with nickname is empty!");
 		}
 	}
@@ -332,20 +306,18 @@ public class LogWindow extends JFrame implements ActionListener, ListSelectionLi
 	/**
 	 * Read from xml file to playersList
 	 */
-	public void unmarshal()
-	{
-		try {			
+	public void unmarshal() {
+		try {
 			JAXBContext jabx = JAXBContext.newInstance(Players.class);
 
 			Unmarshaller unmarsh = jabx.createUnmarshaller();
 			File save = new File("DataPlayers.xml");
-			if(save.canExecute())
+			if (save.canExecute())
 				players = (Players) unmarsh.unmarshal(new File("DataPlayers.xml"));
-			for(int i=0; i<players.playersList.size(); i++)
-			{
+			for (int i = 0; i < players.playersList.size(); i++) {
 				modelAllPlayers.addElement(i + "." + players.playersList.get(i).getName());
 			}
-			
+
 		} catch (JAXBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -356,8 +328,7 @@ public class LogWindow extends JFrame implements ActionListener, ListSelectionLi
 	 * Save playersList to xml file
 	 * 
 	 */
-	public void marshall()
-	{
+	public void marshall() {
 		try {
 			JAXBContext jaxbContext = JAXBContext.newInstance(Players.class);
 			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
@@ -374,15 +345,17 @@ public class LogWindow extends JFrame implements ActionListener, ListSelectionLi
 
 	/**
 	 * 
-	 * @param img - image to scale
-	 * @param width - new img width
-	 * @param height - new img height
+	 * @param img
+	 *            - image to scale
+	 * @param width
+	 *            - new img width
+	 * @param height
+	 *            - new img height
 	 * @return imgIcon
 	 */
-	public ImageIcon scaleImage(Image img, int width, int height)
-	{
+	public ImageIcon scaleImage(Image img, int width, int height) {
 		Image scaleImg = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-		ImageIcon imgIcon= new ImageIcon(scaleImg);
+		ImageIcon imgIcon = new ImageIcon(scaleImg);
 		return imgIcon;
 	}
 

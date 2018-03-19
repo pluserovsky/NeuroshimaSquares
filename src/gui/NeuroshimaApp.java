@@ -64,6 +64,7 @@ public class NeuroshimaApp implements ActionListener, MouseListener {
 	private ArrayList<JLabel> playersLabel = new ArrayList<JLabel>();
 	private ArrayList<JLabel> boardCells = new ArrayList<JLabel>();
 	private ArrayList<JLabel> currentPlayerCards = new ArrayList<JLabel>();
+	private User[][] copyOwners;
 	private JLabel lblNextTurn;
 	private JPanel panelNextTurn;
 	private JPanel panelYourCards;
@@ -217,7 +218,7 @@ public class NeuroshimaApp implements ActionListener, MouseListener {
 
 		for (int i = 0; i < playersCount; i++) {
 			JPanel playerPanel = new JPanel();
-			JLabel scoreLabel = new JLabel("Score: 0");
+			JLabel scoreLabel = new JLabel("Score:" + logWindow.getUsersList().get(i).getScore());
 			scoreLabel.setForeground(Color.white);
 			scoreLabel.setBounds(new Rectangle(8, 15, 100, 20));
 
@@ -489,7 +490,8 @@ public class NeuroshimaApp implements ActionListener, MouseListener {
 
 		if (isCard1 && source == currentPlayerCards.get(0)) {
 			if (isCard1)
-				currentPlayerCards.get(0).setBorder(BorderFactory.createLineBorder(logWindow.getUsersList().get(currentPlayerTurnId).getColor(), 3));
+				currentPlayerCards.get(0).setBorder(BorderFactory
+						.createLineBorder(logWindow.getUsersList().get(currentPlayerTurnId).getColor(), 3));
 			if (isCard2)
 				currentPlayerCards.get(1).setBorder(BorderFactory.createLineBorder(Color.RED, 0));
 			if (isCard3)
@@ -500,7 +502,8 @@ public class NeuroshimaApp implements ActionListener, MouseListener {
 			if (isCard1)
 				currentPlayerCards.get(0).setBorder(BorderFactory.createLineBorder(Color.RED, 0));
 			if (isCard2)
-				currentPlayerCards.get(1).setBorder(BorderFactory.createLineBorder(logWindow.getUsersList().get(currentPlayerTurnId).getColor(), 3));
+				currentPlayerCards.get(1).setBorder(BorderFactory
+						.createLineBorder(logWindow.getUsersList().get(currentPlayerTurnId).getColor(), 3));
 			if (isCard3)
 				currentPlayerCards.get(2).setBorder(BorderFactory.createLineBorder(Color.RED, 0));
 			selectedPlayerCard = currentPlayerCards.get(1);
@@ -511,7 +514,8 @@ public class NeuroshimaApp implements ActionListener, MouseListener {
 			if (isCard2)
 				currentPlayerCards.get(1).setBorder(BorderFactory.createLineBorder(Color.RED, 0));
 			if (isCard3)
-				currentPlayerCards.get(2).setBorder(BorderFactory.createLineBorder(logWindow.getUsersList().get(currentPlayerTurnId).getColor(), 3));
+				currentPlayerCards.get(2).setBorder(BorderFactory
+						.createLineBorder(logWindow.getUsersList().get(currentPlayerTurnId).getColor(), 3));
 			selectedPlayerCard = currentPlayerCards.get(2);
 			selectedPlayerCardId = 2;
 		} else {
@@ -570,7 +574,7 @@ public class NeuroshimaApp implements ActionListener, MouseListener {
 								battleStart = true;
 							battleX = i;
 							battleY = j;
-							if(board.isFull())
+							if (board.isFull())
 								battleStart = true;
 							// field.setAvailable(true);
 							if (battleStart) {
@@ -583,14 +587,12 @@ public class NeuroshimaApp implements ActionListener, MouseListener {
 					}
 				}
 
-			} 
-			else if (!btnNextTurn.isEnabled())
-			{
+			} else if (!btnNextTurn.isEnabled()) {
 				JOptionPane.showMessageDialog(null, "The battle starts now!");
 				battle();
 				battleStart = false;
-			}
-			else 	JOptionPane.showMessageDialog(null, "Your turn passed!");
+			} else
+				JOptionPane.showMessageDialog(null, "Your turn passed!");
 		}
 
 	}
@@ -630,11 +632,17 @@ public class NeuroshimaApp implements ActionListener, MouseListener {
 
 	private void battle() {
 		findMaximum();
-		
-		
+		copyOwners = new User[board.getHeight()][board.getWidth()];
 		ArrayList<Pair<Integer, Integer>> getAttacksCoords = new ArrayList<>();
 		Field[][] copyField = new Field[board.getHeight()][board.getWidth()];
 		// = board.getFieldOnBoard().clone();
+		for (int i = 0; i < board.getHeight(); i++) {
+			for (int j = 0; j < board.getWidth(); j++) {
+				if (!board.getFieldOnBoard()[i][j].isAvailable()
+						|| "Attack".equals(board.getFieldOnBoard()[i][j].getCardOnField().getCardType()))
+					copyOwners[i][j] = board.getFieldOnBoard()[i][j].getCardOnField().getOwner();
+			}
+		}
 		for (int i = 0; i < board.getHeight(); i++) {
 			for (int j = 0; j < board.getWidth(); j++) {
 				copyField[i][j] = board.getFieldOnBoard()[i][j];
@@ -675,10 +683,10 @@ public class NeuroshimaApp implements ActionListener, MouseListener {
 											System.out.println("i =" + i);
 											System.out.println("j =" + j);
 
-											// int points = board.getFieldOnBoard()[x][y].getCardOnField().getOwner()
-											// .getScore();
-											// += board.getFieldOnBoard()[x][y].getCardOnField().getOwner().getScore();
-											// board.getFieldOnBoard()[x][y].getCardOnField().getOwner().setScore(points);
+											int points = copyOwners[i][j].getScore();
+
+											points += board.getFieldOnBoard()[x][y].getCardOnField().getHealth();
+											copyOwners[i][j].setScore(points);
 											// copyField[x][y].setCardOnField(null);
 											copyField[x][y].setAvailable(true);
 										}
@@ -695,31 +703,29 @@ public class NeuroshimaApp implements ActionListener, MouseListener {
 
 			maximumInitiative--;
 		}
-		
+
 		for (int i = 0; i < board.getHeight(); i++) {
 			for (int j = 0; j < board.getWidth(); j++) {
-				//board.getFieldOnBoard()[i][j] = copyField[i][j];
-				
+				// board.getFieldOnBoard()[i][j] = copyField[i][j];
+				board.getFieldOnBoard()[i][j].getCardOnField().getOwner().setScore(copyOwners[i][j].getScore());
 				if (copyField[i][j] != null)
 					if (copyField[i][j].getCardOnField() != null)
-					System.out.print(copyField[i][j].getCardOnField().toString()  + "\n");
-				//	System.out.print(i + " " + j + " - " + copyField[i][j].getCardOnField().getCardType() + "\n");
+						System.out.print(copyField[i][j].getCardOnField().toString() + "\n");
+				// System.out.print(i + " " + j + " - " +
+				// copyField[i][j].getCardOnField().getCardType() + "\n");
 			}
 		}
-		
+
 		repaintMainBoard(copyField);
 		// copyField.
 
 		// copyField.sort(Comparator.comparing(Card::getInitiative()));
 
 	}
-	
-	public void repaintMainBoard(Field[][] copyField)
-	{
-		for(Component component:panelGameMain.getComponents())
-		{
-			if(component instanceof Field)
-			{
+
+	public void repaintMainBoard(Field[][] copyField) {
+		for (Component component : panelGameMain.getComponents()) {
+			if (component instanceof Field) {
 				System.out.print("comp");
 				panelGameMain.remove(component);
 			}
@@ -732,22 +738,19 @@ public class NeuroshimaApp implements ActionListener, MouseListener {
 
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
-				/*Field field = new Field(cellWidth, cellHeight);
-				field.setBounds(j * cellWidth, i * cellHeight, cellWidth, cellHeight);
-				field.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-				field.addMouseListener(this);
-				board.getFieldOnBoard()[i][j] = field;*/
-				
-					//if (copyField[i][j].getCardOnField() != null )
-						//if(copyField[i][j].isAvailable()==false)
+				/*
+				 * Field field = new Field(cellWidth, cellHeight); field.setBounds(j *
+				 * cellWidth, i * cellHeight, cellWidth, cellHeight);
+				 * field.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+				 * field.addMouseListener(this); board.getFieldOnBoard()[i][j] = field;
+				 */
 
-				
-				
-				if (copyField[i][j] != null)
-				{
+				// if (copyField[i][j].getCardOnField() != null )
+				// if(copyField[i][j].isAvailable()==false)
 
-					if(copyField[i][j].getCardOnField()!=null) 
-					{
+				if (copyField[i][j] != null) {
+
+					if (copyField[i][j].getCardOnField() != null) {
 						char dir = '-';
 						switch (copyField[i][j].getCardOnField().getFaces()) {
 						case 'N':
@@ -764,15 +767,16 @@ public class NeuroshimaApp implements ActionListener, MouseListener {
 							break;
 						}
 						String text = "<html><font color=\"#ffff00\">" + dir + "</font><br/>"
-								+ "<font color=\"#00ff00\">+" + copyField[i][j].getCardOnField().getHealth() + "</font><br/>"
-								+ "<font color=\"#ff0000\">-" + copyField[i][j].getCardOnField().getDamage() + "</font><br/>"
-								+ "<font color=\"#00bfff\">" + copyField[i][j].getCardOnField().getInitiative() + "</font>";
+								+ "<font color=\"#00ff00\">+" + copyField[i][j].getCardOnField().getHealth()
+								+ "</font><br/>" + "<font color=\"#ff0000\">-"
+								+ copyField[i][j].getCardOnField().getDamage() + "</font><br/>"
+								+ "<font color=\"#00bfff\">" + copyField[i][j].getCardOnField().getInitiative()
+								+ "</font>";
 						copyField[i][j].setLblAttribute(text);
+
 					}
-					if(copyField[i][j].isAvailable()==true)
-					{
-						if(copyField[i][j].getCardOnField()!=null)	
-						{
+					if (copyField[i][j].isAvailable() == true) {
+						if (copyField[i][j].getCardOnField() != null) {
 							copyField[i][j].setIcon(null);
 							copyField[i][j].setBorder(BorderFactory.createEmptyBorder());
 							copyField[i][j].getLblAttribute().setText("");
